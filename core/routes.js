@@ -9,7 +9,7 @@ module.exports = function(app,url){
         fs.exists('./controllers/' + (path.controller) + '_controller.js', function(exists) {
             if(exists){
                 var c = require('../controllers/' + path.controller + '_controller.js');
-                var controller = new c["controller"](req,res);
+                var controller = new c["controller"](req,res,path.parameters);
                 var action = (path.action) + "_action";
                 if(typeof(controller[action]) == 'function'){
                     controller[action]();
