@@ -3,7 +3,7 @@ var controller = function(req,res){
     this.req = req;
 };
 controller.prototype.index_action = function(){
-    this.res.send('i am actex');
+    this.res.send('i am actionIndex');
 };
 controller.prototype.about_action = function(){
     this.res.send('test');

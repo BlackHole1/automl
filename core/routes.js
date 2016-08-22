@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function(app,url){
     app.all('*',function(req,res){
         var pathname = url.parse(req.url).pathname;
@@ -5,16 +6,22 @@ module.exports = function(app,url){
         if(pathname == "/favicon.ico"){
             return;
         }
-        var c = require('../controllers/' + path.controller + '_controller.js');
-        var controller = new c["controller"](req,res);
-        var action = (path.action) + "_action";
-        if(typeof(controller[action]) == 'function'){
-            controller[action]();
-        }else if(path.action == null){
-            controller['index_action']();;
-        }else{
-            res.send('没有此方法');
-        }
+        fs.exists('./controllers/' + (path.controller) + '_controller.js', function(exists) {
+            if(exists){
+                var c = require('../controllers/' + path.controller + '_controller.js');
+                var controller = new c["controller"](req,res);
+                var action = (path.action) + "_action";
+                if(typeof(controller[action]) == 'function'){
+                    controller[action]();
+                }else if(path.action == null && controller['index_action'] == 'function'){
+                    controller['index_action']();
+                }else{
+                    res.send('找不到方法');
+                }
+            }else{
+                res.send('找不到控制器');
+            }
+        });
     });
 };
 function path_rule(pathname){
@@ -28,6 +35,9 @@ function path_rule(pathname){
     var path = pathname.split('/');
     if(path.length == 1 && path[0] == "" ){
         path[0] = "index";
+        path[1] = "index";
+    }
+    if(path.length == 1 && path[0] != "" ){
         path[1] = "index";
     }
     if(path.length == 2 && path[1] == ""){
@@ -51,6 +61,6 @@ function path_rule(pathname){
     return {
         'controller':path[0],
         'action':path[1],
-        'parameters':parameters
+        'parameters':parameters,
     };
 }
